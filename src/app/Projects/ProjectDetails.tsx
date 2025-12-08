@@ -1311,8 +1311,18 @@ const ProjectDetails: React.FunctionComponent = () => {
                                     : false;
                                   const isSelected = selectedNewUserRoles.has(role.id);
                                   const isExpanded = expandedRoles.has(role.id);
+                                  const disabledCheckbox = isDisabled ? (
+                                    <Checkbox
+                                      id={`disabled-role-checkbox-${role.id}`}
+                                      isDisabled
+                                      isChecked={false}
+                                      aria-label="Role already granted"
+                                      onChange={() => undefined}
+                                    />
+                                  ) : null;
                                       const optionContent = (
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                          {disabledCheckbox}
                                           <Button
                                             variant="plain"
                                             onClick={(e) => {
@@ -1347,7 +1357,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                           <SelectOption
                                             value={role.id}
                                             id={`role-option-${role.id}`}
-                                            hasCheckbox
+                                            hasCheckbox={!isDisabled}
                                 isSelected={isSelected}
                                 isAriaDisabled={isDisabled}
                                 onClick={() => {
@@ -1709,8 +1719,18 @@ const ProjectDetails: React.FunctionComponent = () => {
                                     : false;
                                   const isSelected = selectedNewGroupRoles.has(role.id);
                                   const isExpanded = expandedRoles.has(role.id);
+                                  const disabledCheckbox = isDisabled ? (
+                                    <Checkbox
+                                      id={`disabled-group-role-checkbox-${role.id}`}
+                                      isDisabled
+                                      isChecked={false}
+                                      aria-label="Role already granted"
+                                      onChange={() => undefined}
+                                    />
+                                  ) : null;
                                   const optionContent = (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      {disabledCheckbox}
                                       <Button
                                         variant="plain"
                                         onClick={(e) => {
@@ -1745,7 +1765,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       <SelectOption
                                         value={role.id}
                                         id={`group-role-option-${role.id}`}
-                                        hasCheckbox
+                                        hasCheckbox={!isDisabled}
                                     isSelected={isSelected}
                                     isAriaDisabled={isDisabled}
                                     onClick={() => {
