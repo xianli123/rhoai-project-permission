@@ -28,6 +28,8 @@ import {
   Select,
   SelectList,
   SelectOption,
+  FormSelect,
+  FormSelectOption,
   Tab,
   TabContent,
   TabContentBody,
@@ -150,6 +152,8 @@ const ProjectDetails: React.FunctionComponent = () => {
   const [isRoleModalOpen, setIsRoleModalOpen] = React.useState(false);
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | undefined>();
   const [activeRoleModalTab, setActiveRoleModalTab] = React.useState<'details' | 'assignees'>('details');
+  const [rulesSortBy, setRulesSortBy] = React.useState<{ index: number; direction: 'asc' | 'desc' } | undefined>();
+  const [assigneesSortBy, setAssigneesSortBy] = React.useState<{ index: number; direction: 'asc' | 'desc' } | undefined>();
   // Add user/group state
   const [isAddingUser, setIsAddingUser] = React.useState(false);
   const [isAddingGroup, setIsAddingGroup] = React.useState(false);
@@ -287,16 +291,25 @@ const ProjectDetails: React.FunctionComponent = () => {
     dateAdded: string; // Keep for backward compatibility
   };
 
+  type RoleAssignee = {
+    roleBinding: string;
+    subject: string;
+    subjectType: 'User' | 'Group';
+    dateAdded: string;
+  };
+
   type RoleInfo = {
     id: string;
     name: string;
     label: string;
     description: string;
     realName?: string;
+    roleType?: string;
     actions: string;
     resources: string;
     resourceNames: string;
     assignees: string[];
+    assigneesDetails?: RoleAssignee[];
   };
 
   const mockRoles: RoleInfo[] = [
@@ -339,10 +352,37 @@ const ProjectDetails: React.FunctionComponent = () => {
       label: 'AI',
       description: 'Manage and maintain workbenches.',
       realName: 'workbench-maintainer',
+      roleType: 'RHOAI',
       actions: 'create, delete, get, list, patch, update, watch',
       resources: 'workbenches',
       resourceNames: '—',
       assignees: ['Deena', 'Diana', 'Jeff'],
+      assigneesDetails: [
+        {
+          roleBinding: 'rb-wb-updater-deena',
+          subject: 'Deena',
+          subjectType: 'User',
+          dateAdded: '30 Oct 2024',
+        },
+        {
+          roleBinding: 'rb-wb-updater-diana',
+          subject: 'Diana',
+          subjectType: 'User',
+          dateAdded: '30 Oct 2024',
+        },
+        {
+          roleBinding: 'rb-wb-updater-jeff',
+          subject: 'Jeff',
+          subjectType: 'User',
+          dateAdded: '30 Oct 2024',
+        },
+        {
+          roleBinding: 'rb-wb-updater-workbench team',
+          subject: 'workbench team',
+          subjectType: 'Group',
+          dateAdded: '30 Oct 2024',
+        },
+      ],
     },
     {
       id: 'role-deployments-access',
@@ -423,6 +463,17 @@ const ProjectDetails: React.FunctionComponent = () => {
   const closeRoleModal = () => {
     setIsRoleModalOpen(false);
     setSelectedRoleId(undefined);
+    setActiveRoleModalTab('details');
+    setRulesSortBy(undefined);
+    setAssigneesSortBy(undefined);
+  };
+
+  const onRulesSort = (_event: React.MouseEvent, index: number, direction: 'asc' | 'desc') => {
+    setRulesSortBy({ index, direction });
+  };
+
+  const onAssigneesSort = (_event: React.MouseEvent, index: number, direction: 'asc' | 'desc') => {
+    setAssigneesSortBy({ index, direction });
   };
 
   // Add user/group handlers
@@ -1739,79 +1790,180 @@ const ProjectDetails: React.FunctionComponent = () => {
         variant={ModalVariant.large}
         isOpen={isRoleModalOpen}
         onClose={closeRoleModal}
-        title={selectedRoleId && roleMap[selectedRoleId] ? roleMap[selectedRoleId].name : 'Role details'}
+        title={
+          selectedRoleId && roleMap[selectedRoleId]
+            ? `${roleMap[selectedRoleId].name}`
+            : 'Role details'
+        }
         id="role-details-modal"
       >
         {selectedRoleId && roleMap[selectedRoleId] && (
-          <Tabs
-            activeKey={activeRoleModalTab}
-            onSelect={(_event, key) => setActiveRoleModalTab(key as 'details' | 'assignees')}
-            mountOnEnter
-            unmountOnExit
-          >
-            <Tab eventKey="details" title={<TabTitleText>Role details</TabTitleText>}>
-              <div style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <>
+            <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }} style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>
+              <FlexItem>
                 <Label color="blue" variant="outline" isCompact>
                   AI
                 </Label>
-              </div>
-              <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
-                {roleMap[selectedRoleId].description || 'Description goes here'}
-              </div>
-              <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <strong>Real role name</strong>
-                <Popover
-                  aria-label="Real role name info"
-                  bodyContent="This is the K8s name of this role. You can find the role in OpenShift with this real name."
-                >
-                  <Button variant="plain" aria-label="Real role name help">
-                    <QuestionCircleIcon />
-                  </Button>
-                </Popover>
-              </div>
-              <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
-                <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
-                  {roleMap[selectedRoleId].realName || '—'}
-                </ClipboardCopy>
-              </div>
-              <Divider style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }} />
-              <Title headingLevel="h3" size="lg" style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>
-                Rules
-              </Title>
-              <Table aria-label="Role rules table" id="role-rules-table">
-                <Thead>
-                  <Tr>
-                    <Th>Actions</Th>
-                    <Th>Resources</Th>
-                    <Th>Resource names</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  <Tr>
-                    <Td>{roleMap[selectedRoleId].actions}</Td>
-                    <Td>{roleMap[selectedRoleId].resources}</Td>
-                    <Td>{roleMap[selectedRoleId].resourceNames}</Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Tab>
-            <Tab eventKey="assignees" title={<TabTitleText>Assignees</TabTitleText>}>
-              <Table aria-label="Role assignees table" id="role-assignees-table">
-                <Thead>
-                  <Tr>
-                    <Th>Subject</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {roleMap[selectedRoleId].assignees.map((assignee) => (
-                    <Tr key={assignee}>
-                      <Td>{assignee}</Td>
+              </FlexItem>
+            </Flex>
+            <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
+              {roleMap[selectedRoleId].description || 'Description goes here'}
+            </div>
+            <Tabs
+              activeKey={activeRoleModalTab}
+              onSelect={(_event, key) => setActiveRoleModalTab(key as 'details' | 'assignees')}
+              mountOnEnter
+              unmountOnExit
+            >
+              <Tab eventKey="details" title={<TabTitleText>Role details</TabTitleText>}>
+                <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <strong>Real role name</strong>
+                  <Popover
+                    aria-label="Real role name info"
+                    bodyContent="This is the K8s name of this role. You can find the role in OpenShift with this real name."
+                  >
+                    <Button variant="plain" aria-label="Real role name help">
+                      <QuestionCircleIcon />
+                    </Button>
+                  </Popover>
+                </div>
+                <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
+                  <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
+                    {roleMap[selectedRoleId].realName || 'this-is-the-real-k8s-name-it-could-be-a-very-long-string'}
+                  </ClipboardCopy>
+                </div>
+                <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
+                  <strong>Role type</strong>
+                  <div style={{ marginTop: 'var(--pf-v6-global--spacer--sm)' }}>
+                    <FormSelect
+                      value={roleMap[selectedRoleId].roleType || ''}
+                      id="role-type-select"
+                      aria-label="Role type"
+                    >
+                      <FormSelectOption value="RHOAI" label="RHOAI" />
+                      <FormSelectOption value="Kubernetes" label="Kubernetes" />
+                    </FormSelect>
+                  </div>
+                </div>
+                <Divider style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }} />
+                <Title headingLevel="h3" size="lg" style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>
+                  Rules
+                </Title>
+                <Table aria-label="Role rules table" id="role-rules-table">
+                  <Thead>
+                    <Tr>
+                      <Th
+                        sort={{
+                          sortBy: rulesSortBy || {},
+                          onSort: onRulesSort,
+                          columnIndex: 0,
+                        }}
+                      >
+                        Actions
+                      </Th>
+                      <Th
+                        sort={{
+                          sortBy: rulesSortBy || {},
+                          onSort: onRulesSort,
+                          columnIndex: 1,
+                        }}
+                      >
+                        Resources
+                      </Th>
+                      <Th
+                        sort={{
+                          sortBy: rulesSortBy || {},
+                          onSort: onRulesSort,
+                          columnIndex: 2,
+                        }}
+                      >
+                        Resource names
+                        <Popover
+                          aria-label="Resource names info"
+                          bodyContent="Resource names help text"
+                        >
+                          <Button variant="plain" aria-label="Resource names help" style={{ marginLeft: '4px' }}>
+                            <QuestionCircleIcon />
+                          </Button>
+                        </Popover>
+                      </Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </Tab>
-          </Tabs>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td>{roleMap[selectedRoleId].actions}</Td>
+                      <Td>{roleMap[selectedRoleId].resources}</Td>
+                      <Td>{roleMap[selectedRoleId].resourceNames}</Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </Tab>
+              <Tab eventKey="assignees" title={<TabTitleText>Assignees</TabTitleText>}>
+                <Table aria-label="Role assignees table" id="role-assignees-table">
+                  <Thead>
+                    <Tr>
+                      <Th
+                        sort={{
+                          sortBy: assigneesSortBy || {},
+                          onSort: onAssigneesSort,
+                          columnIndex: 0,
+                        }}
+                      >
+                        Role binding
+                      </Th>
+                      <Th
+                        sort={{
+                          sortBy: assigneesSortBy || {},
+                          onSort: onAssigneesSort,
+                          columnIndex: 1,
+                        }}
+                      >
+                        Subject
+                      </Th>
+                      <Th
+                        sort={{
+                          sortBy: assigneesSortBy || {},
+                          onSort: onAssigneesSort,
+                          columnIndex: 2,
+                        }}
+                      >
+                        Date added
+                      </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {(roleMap[selectedRoleId].assigneesDetails || roleMap[selectedRoleId].assignees.map((assignee, idx) => ({
+                      roleBinding: `rb-${selectedRoleId}-${assignee.toLowerCase().replace(/\s+/g, '-')}`,
+                      subject: assignee,
+                      subjectType: 'User' as const,
+                      dateAdded: '30 Oct 2024',
+                    }))).map((assignee) => (
+                      <Tr key={assignee.roleBinding}>
+                        <Td>{assignee.roleBinding}</Td>
+                        <Td>
+                          <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
+                            <FlexItem>{assignee.subject}</FlexItem>
+                            <FlexItem>
+                              <Label
+                                color={assignee.subjectType === 'User' ? 'green' : 'blue'}
+                                variant="outline"
+                                isCompact
+                              >
+                                {assignee.subjectType}
+                              </Label>
+                            </FlexItem>
+                          </Flex>
+                        </Td>
+                        <Td>
+                          <span style={{ textDecoration: 'underline' }}>{assignee.dateAdded}</span>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Tab>
+            </Tabs>
+          </>
         )}
       </Modal>
     </>
