@@ -533,7 +533,9 @@ const ProjectDetails: React.FunctionComponent = () => {
 
   const handleUserSelect = (_event: React.MouseEvent | undefined, value: string | number | undefined) => {
     if (value === 'create') {
-      setSelectedNewUser(null);
+      // Use the typed input as the new user name
+      setSelectedNewUser(newUserInput.trim());
+      setNewUserInput(newUserInput.trim());
     } else {
       setSelectedNewUser(value as string);
       setNewUserInput(value as string);
@@ -550,7 +552,9 @@ const ProjectDetails: React.FunctionComponent = () => {
 
   const handleGroupSelect = (_event: React.MouseEvent | undefined, value: string | number | undefined) => {
     if (value === 'create') {
-      setSelectedNewGroup(null);
+      // Use the typed input as the new group name
+      setSelectedNewGroup(newGroupInput.trim());
+      setNewGroupInput(newGroupInput.trim());
     } else {
       setSelectedNewGroup(value as string);
       setNewGroupInput(value as string);
@@ -1108,42 +1112,41 @@ const ProjectDetails: React.FunctionComponent = () => {
                                 isExpanded={isUserSelectOpen}
                                 isFullWidth
                               >
-                                <Flex>
-                                  <FlexItem grow={{ default: 'grow' }}>
-                                    <TextInputGroup isPlain>
-                                      <TextInputGroupMain
-                                        value={newUserInput}
-                                        onChange={(_event, value) => {
-                                          setNewUserInput(value);
-                                          // If user types something different, clear selected user
-                                          if (value !== selectedNewUser) {
-                                            setSelectedNewUser(null);
-                                          }
-                                        }}
-                                        onFocus={() => setIsUserSelectOpen(true)}
-                                        placeholder="Type to search or create"
-                                        id="new-user-input"
-                                      />
-                                    </TextInputGroup>
-                                  </FlexItem>
-                                  {(selectedNewUser || newUserInput.trim()) && (
-                                    <FlexItem>
-                                      <Button
-                                        variant="plain"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSelectedNewUser(null);
-                                          setNewUserInput('');
-                                          setIsUserSelectOpen(false);
-                                        }}
-                                        aria-label="Clear selection"
-                                        id="clear-user-selection"
-                                      >
-                                        <CloseIcon />
-                                      </Button>
-                                    </FlexItem>
+                                <TextInputGroup isPlain>
+                                  {selectedNewUser && (
+                                    <TextInputGroupMain
+                                      value={selectedNewUser}
+                                      readOnly
+                                      id="new-user-input-selected"
+                                    />
                                   )}
-                                </Flex>
+                                  {!selectedNewUser && (
+                                    <TextInputGroupMain
+                                      value={newUserInput}
+                                      onChange={(_event, value) => {
+                                        setNewUserInput(value);
+                                      }}
+                                      onFocus={() => setIsUserSelectOpen(true)}
+                                      placeholder="Type to search or create"
+                                      id="new-user-input"
+                                    />
+                                  )}
+                                  {(selectedNewUser || newUserInput.trim()) && (
+                                    <Button
+                                      variant="plain"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedNewUser(null);
+                                        setNewUserInput('');
+                                        setIsUserSelectOpen(false);
+                                      }}
+                                      aria-label="Clear selection"
+                                      id="clear-user-selection"
+                                    >
+                                      <CloseIcon />
+                                    </Button>
+                                  )}
+                                </TextInputGroup>
                               </MenuToggle>
                             )}
                             popperProps={{ appendTo: () => document.body }}
@@ -1491,42 +1494,41 @@ const ProjectDetails: React.FunctionComponent = () => {
                                     isExpanded={isGroupSelectOpen}
                                     isFullWidth
                                   >
-                                    <Flex>
-                                      <FlexItem grow={{ default: 'grow' }}>
-                                        <TextInputGroup isPlain>
-                                          <TextInputGroupMain
-                                            value={newGroupInput}
-                                            onChange={(_event, value) => {
-                                              setNewGroupInput(value);
-                                              // If user types something different, clear selected group
-                                              if (value !== selectedNewGroup) {
-                                                setSelectedNewGroup(null);
-                                              }
-                                            }}
-                                            onFocus={() => setIsGroupSelectOpen(true)}
-                                            placeholder="Type to search or create"
-                                            id="new-group-input"
-                                          />
-                                        </TextInputGroup>
-                                      </FlexItem>
-                                      {(selectedNewGroup || newGroupInput.trim()) && (
-                                        <FlexItem>
-                                          <Button
-                                            variant="plain"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setSelectedNewGroup(null);
-                                              setNewGroupInput('');
-                                              setIsGroupSelectOpen(false);
-                                            }}
-                                            aria-label="Clear selection"
-                                            id="clear-group-selection"
-                                          >
-                                            <CloseIcon />
-                                          </Button>
-                                        </FlexItem>
+                                    <TextInputGroup isPlain>
+                                      {selectedNewGroup && (
+                                        <TextInputGroupMain
+                                          value={selectedNewGroup}
+                                          readOnly
+                                          id="new-group-input-selected"
+                                        />
                                       )}
-                                    </Flex>
+                                      {!selectedNewGroup && (
+                                        <TextInputGroupMain
+                                          value={newGroupInput}
+                                          onChange={(_event, value) => {
+                                            setNewGroupInput(value);
+                                          }}
+                                          onFocus={() => setIsGroupSelectOpen(true)}
+                                          placeholder="Type to search or create"
+                                          id="new-group-input"
+                                        />
+                                      )}
+                                      {(selectedNewGroup || newGroupInput.trim()) && (
+                                        <Button
+                                          variant="plain"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedNewGroup(null);
+                                            setNewGroupInput('');
+                                            setIsGroupSelectOpen(false);
+                                          }}
+                                          aria-label="Clear selection"
+                                          id="clear-group-selection"
+                                        >
+                                          <CloseIcon />
+                                        </Button>
+                                      )}
+                                    </TextInputGroup>
                                   </MenuToggle>
                                 )}
                                 popperProps={{ appendTo: () => document.body }}
