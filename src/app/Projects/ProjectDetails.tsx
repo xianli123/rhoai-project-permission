@@ -1254,9 +1254,10 @@ const ProjectDetails: React.FunctionComponent = () => {
                                 isFullWidth
                                 isDisabled={!selectedNewUser && !newUserInput.trim()}
                               >
-                                {selectedNewUserRoles.size > 0 ? (
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
-                                    {Array.from(selectedNewUserRoles).map((roleId) => {
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                  {selectedNewUserRoles.size > 0 ? (
+                                    Array.from(selectedNewUserRoles).map((roleId) => {
                                       const role = mockRoles.find((r) => r.id === roleId);
                                       if (!role) return null;
                                       return (
@@ -1276,11 +1277,24 @@ const ProjectDetails: React.FunctionComponent = () => {
                                           {role.name}
                                         </Label>
                                       );
-                                    })}
-                                  </div>
-                                ) : (
-                                  'Select roles'
+                                    })
+                                  ) : (
+                                    'Select roles'
+                                  )}
+                                </div>
+                                {selectedNewUserRoles.size > 0 && (
+                                  <Button
+                                    variant="plain"
+                                    aria-label="Clear selected roles"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedNewUserRoles(new Set());
+                                    }}
+                                  >
+                                    <CloseIcon />
+                                  </Button>
                                 )}
+                              </div>
                               </MenuToggle>
                             )}
                             popperProps={{ appendTo: () => document.body }}
@@ -1334,6 +1348,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             isSelected={isSelected}
                                             isDisabled={isDisabled}
                                             onClick={() => !isDisabled && handleRoleToggle(role.id)}
+                                            description={role.description || 'Role description'}
                                           >
                                             {isDisabled ? (
                                               <Tooltip content="This role has been granted to the selected user">{optionContent}</Tooltip>
@@ -1636,33 +1651,47 @@ const ProjectDetails: React.FunctionComponent = () => {
                                     isFullWidth
                                     isDisabled={!selectedNewGroup && !newGroupInput.trim()}
                                   >
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
                                     {selectedNewGroupRoles.size > 0 ? (
-                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
-                                        {Array.from(selectedNewGroupRoles).map((roleId) => {
-                                          const role = mockRoles.find((r) => r.id === roleId);
-                                          if (!role) return null;
-                                          return (
-                                            <Label
-                                              key={roleId}
-                                              color="blue"
-                                              variant="outline"
-                                              onClose={() => {
-                                                setSelectedNewGroupRoles((prev) => {
-                                                  const newSet = new Set(prev);
-                                                  newSet.delete(roleId);
-                                                  return newSet;
-                                                });
-                                              }}
-                                              id={`selected-group-role-label-${roleId}`}
-                                            >
-                                              {role.name}
-                                            </Label>
-                                          );
-                                        })}
-                                      </div>
+                                      Array.from(selectedNewGroupRoles).map((roleId) => {
+                                        const role = mockRoles.find((r) => r.id === roleId);
+                                        if (!role) return null;
+                                        return (
+                                          <Label
+                                            key={roleId}
+                                            color="blue"
+                                            variant="outline"
+                                            onClose={() => {
+                                              setSelectedNewGroupRoles((prev) => {
+                                                const newSet = new Set(prev);
+                                                newSet.delete(roleId);
+                                                return newSet;
+                                              });
+                                            }}
+                                            id={`selected-group-role-label-${roleId}`}
+                                          >
+                                            {role.name}
+                                          </Label>
+                                        );
+                                      })
                                     ) : (
                                       'Select roles'
                                     )}
+                                  </div>
+                                  {selectedNewGroupRoles.size > 0 && (
+                                    <Button
+                                      variant="plain"
+                                      aria-label="Clear selected roles"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedNewGroupRoles(new Set());
+                                      }}
+                                    >
+                                      <CloseIcon />
+                                    </Button>
+                                  )}
+                                </div>
                                   </MenuToggle>
                                 )}
                                 popperProps={{ appendTo: () => document.body }}
@@ -1714,6 +1743,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         isSelected={isSelected}
                                         isDisabled={isDisabled}
                                         onClick={() => !isDisabled && handleRoleToggle(role.id)}
+                                        description={role.description || 'Role description'}
                                       >
                                         {isDisabled ? (
                                           <Tooltip content="This role has been granted to the selected user">{optionContent}</Tooltip>
