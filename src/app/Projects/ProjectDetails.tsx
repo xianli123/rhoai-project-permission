@@ -298,7 +298,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-project-admin',
       name: 'Project admin',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'Full project administration access.',
       realName: 'project-admin',
       actions: 'create, delete, deletecollection, get, list, patch, update, watch',
@@ -309,7 +309,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-project-contributor',
       name: 'Project contributor',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'Contribute to project workloads.',
       realName: 'project-contributor',
       actions: 'get, list, patch, update, watch',
@@ -320,7 +320,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-project-access',
       name: 'Project access',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'View access to project.',
       realName: 'project-access',
       actions: 'get, list, watch',
@@ -331,7 +331,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-workbench-maintainer',
       name: 'Workbench maintainer',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'Manage and maintain workbenches.',
       realName: 'workbench-maintainer',
       actions: 'create, delete, get, list, patch, update, watch',
@@ -342,7 +342,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-deployments-access',
       name: 'Deployments access',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'Access to deployments.',
       realName: 'deployments-access',
       actions: 'get, list, watch',
@@ -353,7 +353,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-pipeline-reader',
       name: 'Pipeline reader',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'Read access to pipelines.',
       realName: 'pipeline-reader',
       actions: 'get, list, watch',
@@ -364,7 +364,7 @@ const ProjectDetails: React.FunctionComponent = () => {
     {
       id: 'role-workbench-reader',
       name: 'Workbench reader',
-      label: 'RHOAI',
+      label: 'AI',
       description: 'Read access to workbenches.',
       realName: 'workbench-reader',
       actions: 'get, list, watch',
@@ -374,8 +374,8 @@ const ProjectDetails: React.FunctionComponent = () => {
     },
     {
       id: 'role-custom',
-      name: 'Custom',
-      label: 'this-is-the-k8s-role',
+      name: 'this-is-the-k8s-role-name',
+      label: 'AI',
       description: 'Custom cluster role',
       realName: 'custom-role',
       actions: 'create, delete, deletecollection, get, list, patch, update, watch',
@@ -1026,11 +1026,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       >
                                         {role.name}
                                       </Button>
-                                      {role.id === 'role-custom' ? (
-                                        <Label id={`user-role-label-${user.id}-${roleWithDate.roleId}`} style={{ backgroundColor: 'var(--pf-v6-global--BackgroundColor--200)' }}>
-                                          {role.realName || role.label}
-                                        </Label>
-                                      ) : (
+                                      {role.id !== 'role-custom' && (
                                         <Label id={`user-role-label-${user.id}-${roleWithDate.roleId}`} color="blue" variant="outline">
                                           {role.label}
                                         </Label>
@@ -1181,77 +1177,80 @@ const ProjectDetails: React.FunctionComponent = () => {
                               {mockRoles
                                 .filter((role) => role.id !== 'role-custom')
                                 .map((role) => {
-                                  const isDisabled = selectedNewUser
+                                      const isDisabled = selectedNewUser
                                     ? getExistingUserRoles(selectedNewUser).has(role.id)
                                     : false;
                                   const isSelected = selectedNewUserRoles.has(role.id);
                                   const isExpanded = expandedRoles.has(role.id);
-                                return (
-                                  <React.Fragment key={role.id}>
-                                    <SelectOption
-                                      value={role.id}
-                                      id={`role-option-${role.id}`}
-                                      hasCheckbox
-                                      isSelected={isSelected}
-                                      isDisabled={isDisabled}
-                                      onClick={() => !isDisabled && handleRoleToggle(role.id)}
-                                    >
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Button
-                                          variant="plain"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleRoleExpansion(role.id);
-                                          }}
-                                          id={`expand-role-${role.id}`}
-                                          style={{ padding: 0 }}
-                                        >
-                                          <AngleRightIcon
-                                            style={{
-                                              transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                                              transition: 'transform 0.2s',
+                                      const optionContent = (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                          <Button
+                                            variant="plain"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              toggleRoleExpansion(role.id);
                                             }}
-                                          />
-                                        </Button>
-                                        <span>{role.name}</span>
-                                        {role.id === 'role-custom' ? (
-                                          <Label style={{ backgroundColor: 'var(--pf-v6-global--BackgroundColor--200)' }}>
-                                            {role.realName || role.label}
-                                          </Label>
-                                        ) : (
-                                          <Label color="blue" variant="outline">
-                                            {role.label}
-                                          </Label>
-                                        )}
-                                        {isDisabled && (
-                                          <Tooltip content="The selected user has already owned this role, please choose some other roles.">
-                                            <ExclamationCircleIcon style={{ color: 'var(--pf-v6-global--warning-color--100)' }} />
-                                          </Tooltip>
-                                        )}
-                                      </div>
-                                    </SelectOption>
-                                    {isExpanded && (
-                                      <div style={{ paddingLeft: 'var(--pf-v6-global--spacer--xl)', paddingBottom: 'var(--pf-v6-global--spacer--sm)' }}>
-                                        <Table variant="compact" isNested>
-                                          <Thead>
-                                            <Tr>
-                                              <Th>Actions</Th>
-                                              <Th>Resources</Th>
-                                              <Th>Resource names</Th>
-                                            </Tr>
-                                          </Thead>
-                                          <Tbody>
-                                            <Tr>
-                                              <Td>{role.actions}</Td>
-                                              <Td>{role.resources}</Td>
-                                              <Td>{role.resourceNames}</Td>
-                                            </Tr>
-                                          </Tbody>
-                                        </Table>
-                                      </div>
-                                    )}
-                                  </React.Fragment>
-                                );
+                                            id={`expand-role-${role.id}`}
+                                            style={{ padding: 0 }}
+                                          >
+                                            <AngleRightIcon
+                                              style={{
+                                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.2s',
+                                              }}
+                                            />
+                                          </Button>
+                                          <span>{role.name}</span>
+                                          {role.id !== 'role-custom' && (
+                                            <Label color="blue" variant="outline">
+                                              {role.label}
+                                            </Label>
+                                          )}
+                                          {isDisabled && (
+                                            <Tooltip content="This role has been granted to the selected user">
+                                              <ExclamationCircleIcon style={{ color: 'var(--pf-v6-global--warning-color--100)' }} />
+                                            </Tooltip>
+                                          )}
+                                        </div>
+                                      );
+                                      return (
+                                        <React.Fragment key={role.id}>
+                                          <SelectOption
+                                            value={role.id}
+                                            id={`role-option-${role.id}`}
+                                            hasCheckbox
+                                            isSelected={isSelected}
+                                            isDisabled={isDisabled}
+                                            onClick={() => !isDisabled && handleRoleToggle(role.id)}
+                                          >
+                                            {isDisabled ? (
+                                              <Tooltip content="This role has been granted to the selected user">{optionContent}</Tooltip>
+                                            ) : (
+                                              optionContent
+                                            )}
+                                          </SelectOption>
+                                          {isExpanded && (
+                                            <div style={{ paddingLeft: 'var(--pf-v6-global--spacer--xl)', paddingBottom: 'var(--pf-v6-global--spacer--sm)' }}>
+                                              <Table variant="compact" isNested>
+                                                <Thead>
+                                                  <Tr>
+                                                    <Th>Actions</Th>
+                                                    <Th>Resources</Th>
+                                                    <Th>Resource names</Th>
+                                                  </Tr>
+                                                </Thead>
+                                                <Tbody>
+                                                  <Tr>
+                                                    <Td>{role.actions}</Td>
+                                                    <Td>{role.resources}</Td>
+                                                    <Td>{role.resourceNames}</Td>
+                                                  </Tr>
+                                                </Tbody>
+                                              </Table>
+                                            </div>
+                                          )}
+                                        </React.Fragment>
+                                      );
                               })}
                             </SelectList>
                           </Select>
@@ -1364,11 +1363,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       >
                                         {role.name}
                                       </Button>
-                                      {role.id === 'role-custom' ? (
-                                        <Label id={`group-role-label-${group.id}-${roleWithDate.roleId}`} style={{ backgroundColor: 'var(--pf-v6-global--BackgroundColor--200)' }}>
-                                          {role.realName || role.label}
-                                        </Label>
-                                      ) : (
+                                      {role.id !== 'role-custom' && (
                                         <Label id={`group-role-label-${group.id}-${roleWithDate.roleId}`} color="blue" variant="outline">
                                           {role.label}
                                         </Label>
@@ -1517,71 +1512,80 @@ const ProjectDetails: React.FunctionComponent = () => {
                               >
                                 <SelectList>
                                   {mockRoles.map((role) => {
-                                    const isDisabled = selectedNewGroup
-                                      ? getExistingGroupRoles(selectedNewGroup).has(role.id)
-                                      : false;
-                                    const isSelected = selectedNewGroupRoles.has(role.id);
-                                    const isExpanded = expandedRoles.has(role.id);
-                                    return (
-                                      <React.Fragment key={role.id}>
-                                        <SelectOption
-                                          value={role.id}
-                                          id={`group-role-option-${role.id}`}
-                                          hasCheckbox
-                                          isSelected={isSelected}
-                                          isDisabled={isDisabled}
-                                          onClick={() => !isDisabled && handleRoleToggle(role.id)}
-                                        >
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <Button
-                                              variant="plain"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleRoleExpansion(role.id);
-                                              }}
-                                              id={`expand-group-role-${role.id}`}
-                                              style={{ padding: 0 }}
-                                            >
-                                              <AngleRightIcon
-                                                style={{
-                                                  transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                                                  transition: 'transform 0.2s',
-                                                }}
-                                              />
-                                            </Button>
-                                            <span>{role.name}</span>
-                                            <Label color="blue" variant="outline">
-                                              {role.label}
-                                            </Label>
-                                            {isDisabled && (
-                                              <Tooltip content="The selected group has already owned this role, please choose some other roles.">
-                                                <ExclamationCircleIcon style={{ color: 'var(--pf-v6-global--warning-color--100)' }} />
-                                              </Tooltip>
-                                            )}
-                                          </div>
-                                        </SelectOption>
-                                        {isExpanded && (
-                                          <div style={{ paddingLeft: 'var(--pf-v6-global--spacer--xl)', paddingBottom: 'var(--pf-v6-global--spacer--sm)' }}>
-                                            <Table variant="compact" isNested>
-                                              <Thead>
-                                                <Tr>
-                                                  <Th>Actions</Th>
-                                                  <Th>Resources</Th>
-                                                  <Th>Resource names</Th>
-                                                </Tr>
-                                              </Thead>
-                                              <Tbody>
-                                                <Tr>
-                                                  <Td>{role.actions}</Td>
-                                                  <Td>{role.resources}</Td>
-                                                  <Td>{role.resourceNames}</Td>
-                                                </Tr>
-                                              </Tbody>
-                                            </Table>
-                                          </div>
+                                  const isDisabled = selectedNewGroup
+                                    ? getExistingGroupRoles(selectedNewGroup).has(role.id)
+                                    : false;
+                                  const isSelected = selectedNewGroupRoles.has(role.id);
+                                  const isExpanded = expandedRoles.has(role.id);
+                                  const optionContent = (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <Button
+                                        variant="plain"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleRoleExpansion(role.id);
+                                        }}
+                                        id={`expand-group-role-${role.id}`}
+                                        style={{ padding: 0 }}
+                                      >
+                                        <AngleRightIcon
+                                          style={{
+                                            transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s',
+                                          }}
+                                        />
+                                      </Button>
+                                      <span>{role.name}</span>
+                                      {role.id !== 'role-custom' && (
+                                        <Label color="blue" variant="outline">
+                                          {role.label}
+                                        </Label>
+                                      )}
+                                      {isDisabled && (
+                                        <Tooltip content="This role has been granted to the selected user">
+                                          <ExclamationCircleIcon style={{ color: 'var(--pf-v6-global--warning-color--100)' }} />
+                                        </Tooltip>
+                                      )}
+                                    </div>
+                                  );
+                                  return (
+                                    <React.Fragment key={role.id}>
+                                      <SelectOption
+                                        value={role.id}
+                                        id={`group-role-option-${role.id}`}
+                                        hasCheckbox
+                                        isSelected={isSelected}
+                                        isDisabled={isDisabled}
+                                        onClick={() => !isDisabled && handleRoleToggle(role.id)}
+                                      >
+                                        {isDisabled ? (
+                                          <Tooltip content="This role has been granted to the selected user">{optionContent}</Tooltip>
+                                        ) : (
+                                          optionContent
                                         )}
-                                      </React.Fragment>
-                                    );
+                                      </SelectOption>
+                                      {isExpanded && (
+                                        <div style={{ paddingLeft: 'var(--pf-v6-global--spacer--xl)', paddingBottom: 'var(--pf-v6-global--spacer--sm)' }}>
+                                          <Table variant="compact" isNested>
+                                            <Thead>
+                                              <Tr>
+                                                <Th>Actions</Th>
+                                                <Th>Resources</Th>
+                                                <Th>Resource names</Th>
+                                              </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                              <Tr>
+                                                <Td>{role.actions}</Td>
+                                                <Td>{role.resources}</Td>
+                                                <Td>{role.resourceNames}</Td>
+                                              </Tr>
+                                            </Tbody>
+                                          </Table>
+                                        </div>
+                                      )}
+                                    </React.Fragment>
+                                  );
                                   })}
                                 </SelectList>
                               </Select>
