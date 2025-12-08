@@ -25,6 +25,10 @@ import {
   Grid,
   GridItem,
   PageSection,
+  DescriptionList,
+  DescriptionListGroup,
+  DescriptionListTerm,
+  DescriptionListDescription,
   Select,
   SelectList,
   SelectOption,
@@ -1816,35 +1820,42 @@ const ProjectDetails: React.FunctionComponent = () => {
               unmountOnExit
             >
               <Tab eventKey="details" title={<TabTitleText>Role details</TabTitleText>}>
-                <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <strong>Real role name</strong>
-                  <Popover
-                    aria-label="Real role name info"
-                    bodyContent="This is the K8s name of this role. You can find the role in OpenShift with this real name."
-                  >
-                    <Button variant="plain" aria-label="Real role name help">
-                      <QuestionCircleIcon />
-                    </Button>
-                  </Popover>
-                </div>
-                <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
-                  <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
-                    {roleMap[selectedRoleId].realName || 'this-is-the-real-k8s-name-it-could-be-a-very-long-string'}
-                  </ClipboardCopy>
-                </div>
-                <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
-                  <strong>Role type</strong>
-                  <div style={{ marginTop: 'var(--pf-v6-global--spacer--sm)' }}>
-                    <FormSelect
-                      value={roleMap[selectedRoleId].roleType || ''}
-                      id="role-type-select"
-                      aria-label="Role type"
-                    >
-                      <FormSelectOption value="RHOAI" label="RHOAI" />
-                      <FormSelectOption value="Kubernetes" label="Kubernetes" />
-                    </FormSelect>
-                  </div>
-                </div>
+                <DescriptionList isHorizontal isCompact style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>
+                      <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
+                        <span>Real role name</span>
+                        <Popover
+                          aria-label="Real role name info"
+                          bodyContent="This is the K8s name of this role. You can find the role in OpenShift with this real name."
+                        >
+                          <Button variant="plain" aria-label="Real role name help">
+                            <QuestionCircleIcon />
+                          </Button>
+                        </Popover>
+                      </Flex>
+                    </DescriptionListTerm>
+                    <DescriptionListDescription>
+                      <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
+                        {roleMap[selectedRoleId].realName || 'this-is-the-real-k8s-name-it-could-be-a-very-long-string'}
+                      </ClipboardCopy>
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>Role type</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      <FormSelect
+                        value={roleMap[selectedRoleId].roleType || 'RHOAI'}
+                        id="role-type-select"
+                        aria-label="Role type"
+                        isDisabled
+                      >
+                        <FormSelectOption value="RHOAI" label="RHOAI" />
+                        <FormSelectOption value="Kubernetes" label="Kubernetes" />
+                      </FormSelect>
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                </DescriptionList>
                 <Divider style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }} />
                 <Title headingLevel="h3" size="lg" style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>
                   Rules
