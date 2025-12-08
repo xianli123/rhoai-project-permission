@@ -1340,16 +1340,11 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             />
                                           </Button>
                                           <span>{role.name}</span>
-                                          {role.id !== 'role-custom' && (
-                                            <Label color="blue" variant="outline" isCompact>
-                                              {role.label}
-                                            </Label>
-                                          )}
-                                          {isDisabled && (
-                                            <Tooltip content="This role has been granted to the selected user">
-                                              <ExclamationCircleIcon style={{ color: 'var(--pf-v6-global--warning-color--100)' }} />
-                                            </Tooltip>
-                                          )}
+                                      {role.id !== 'role-custom' && (
+                                        <Label color="blue" variant="outline" isCompact>
+                                          {role.label}
+                                        </Label>
+                                      )}
                                         </div>
                                       );
                                       return (
@@ -1752,11 +1747,6 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         <Label color="blue" variant="outline" isCompact>
                                           {role.label}
                                         </Label>
-                                      )}
-                                      {isDisabled && (
-                                        <Tooltip content="This role has been granted to the selected user">
-                                          <ExclamationCircleIcon style={{ color: 'var(--pf-v6-global--warning-color--100)' }} />
-                                        </Tooltip>
                                       )}
                                     </div>
                                   );
