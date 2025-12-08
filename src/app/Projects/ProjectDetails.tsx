@@ -1232,6 +1232,9 @@ const ProjectDetails: React.FunctionComponent = () => {
                                 )}
                             </SelectList>
                           </Select>
+                          <Content component="small" style={{ marginTop: 'var(--pf-v6-global--spacer--sm)', color: 'var(--pf-v6-global--Color--200)' }}>
+                            Only users with existing permissions are listed. To add someone new, enter their username.
+                          </Content>
                           {selectedNewUser && isExistingUser(selectedNewUser) && (
                             <Alert
                               variant={AlertVariant.info}
@@ -1345,9 +1348,12 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             value={role.id}
                                             id={`role-option-${role.id}`}
                                             hasCheckbox
-                                            isSelected={isSelected}
-                                            isDisabled={isDisabled}
-                                            onClick={() => !isDisabled && handleRoleToggle(role.id)}
+                                isSelected={isSelected}
+                                isAriaDisabled={isDisabled}
+                                onClick={() => {
+                                  if (isDisabled) return;
+                                  handleRoleToggle(role.id);
+                                }}
                                             description={role.description || 'Role description'}
                                           >
                                             {isDisabled ? (
@@ -1740,9 +1746,12 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         value={role.id}
                                         id={`group-role-option-${role.id}`}
                                         hasCheckbox
-                                        isSelected={isSelected}
-                                        isDisabled={isDisabled}
-                                        onClick={() => !isDisabled && handleRoleToggle(role.id)}
+                                    isSelected={isSelected}
+                                    isAriaDisabled={isDisabled}
+                                    onClick={() => {
+                                      if (isDisabled) return;
+                                      handleRoleToggle(role.id);
+                                    }}
                                         description={role.description || 'Role description'}
                                       >
                                         {isDisabled ? (
