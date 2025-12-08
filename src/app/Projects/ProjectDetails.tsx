@@ -56,6 +56,7 @@ import {
   CheckIcon,
   TimesIcon,
   AngleRightIcon,
+  CloseIcon,
 } from '@patternfly/react-icons';
 
 type Project = {
@@ -1027,7 +1028,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         {role.name}
                                       </Button>
                                       {role.id !== 'role-custom' && (
-                                        <Label id={`user-role-label-${user.id}-${roleWithDate.roleId}`} color="blue" variant="outline">
+                                        <Label id={`user-role-label-${user.id}-${roleWithDate.roleId}`} color="blue" variant="outline" isCompact>
                                           {role.label}
                                         </Label>
                                       )}
@@ -1107,21 +1108,42 @@ const ProjectDetails: React.FunctionComponent = () => {
                                 isExpanded={isUserSelectOpen}
                                 isFullWidth
                               >
-                                <TextInputGroup isPlain>
-                                  <TextInputGroupMain
-                                    value={newUserInput}
-                                    onChange={(_event, value) => {
-                                      setNewUserInput(value);
-                                      // If user types something different, clear selected user
-                                      if (value !== selectedNewUser) {
-                                        setSelectedNewUser(null);
-                                      }
-                                    }}
-                                    onFocus={() => setIsUserSelectOpen(true)}
-                                    placeholder="Type to search or create"
-                                    id="new-user-input"
-                                  />
-                                </TextInputGroup>
+                                <Flex>
+                                  <FlexItem grow={{ default: 'grow' }}>
+                                    <TextInputGroup isPlain>
+                                      <TextInputGroupMain
+                                        value={newUserInput}
+                                        onChange={(_event, value) => {
+                                          setNewUserInput(value);
+                                          // If user types something different, clear selected user
+                                          if (value !== selectedNewUser) {
+                                            setSelectedNewUser(null);
+                                          }
+                                        }}
+                                        onFocus={() => setIsUserSelectOpen(true)}
+                                        placeholder="Type to search or create"
+                                        id="new-user-input"
+                                      />
+                                    </TextInputGroup>
+                                  </FlexItem>
+                                  {(selectedNewUser || newUserInput.trim()) && (
+                                    <FlexItem>
+                                      <Button
+                                        variant="plain"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedNewUser(null);
+                                          setNewUserInput('');
+                                          setIsUserSelectOpen(false);
+                                        }}
+                                        aria-label="Clear selection"
+                                        id="clear-user-selection"
+                                      >
+                                        <CloseIcon />
+                                      </Button>
+                                    </FlexItem>
+                                  )}
+                                </Flex>
                               </MenuToggle>
                             )}
                             popperProps={{ appendTo: () => document.body }}
@@ -1162,13 +1184,38 @@ const ProjectDetails: React.FunctionComponent = () => {
                             toggle={(toggleRef) => (
                               <MenuToggle
                                 ref={toggleRef}
-                                onClick={() => setIsUserRoleSelectOpen(!isUserRoleSelectOpen)}
+                                onClick={() => !(!selectedNewUser && !newUserInput.trim()) && setIsUserRoleSelectOpen(!isUserRoleSelectOpen)}
                                 isExpanded={isUserRoleSelectOpen}
                                 isFullWidth
+                                isDisabled={!selectedNewUser && !newUserInput.trim()}
                               >
-                                {selectedNewUserRoles.size > 0
-                                  ? `${selectedNewUserRoles.size} role${selectedNewUserRoles.size > 1 ? 's' : ''} selected`
-                                  : 'Select roles'}
+                                {selectedNewUserRoles.size > 0 ? (
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                    {Array.from(selectedNewUserRoles).map((roleId) => {
+                                      const role = mockRoles.find((r) => r.id === roleId);
+                                      if (!role) return null;
+                                      return (
+                                        <Label
+                                          key={roleId}
+                                          color="blue"
+                                          variant="outline"
+                                          onClose={() => {
+                                            setSelectedNewUserRoles((prev) => {
+                                              const newSet = new Set(prev);
+                                              newSet.delete(roleId);
+                                              return newSet;
+                                            });
+                                          }}
+                                          id={`selected-role-label-${roleId}`}
+                                        >
+                                          {role.name}
+                                        </Label>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  'Select roles'
+                                )}
                               </MenuToggle>
                             )}
                             popperProps={{ appendTo: () => document.body }}
@@ -1202,7 +1249,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                           </Button>
                                           <span>{role.name}</span>
                                           {role.id !== 'role-custom' && (
-                                            <Label color="blue" variant="outline">
+                                            <Label color="blue" variant="outline" isCompact>
                                               {role.label}
                                             </Label>
                                           )}
@@ -1364,7 +1411,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         {role.name}
                                       </Button>
                                       {role.id !== 'role-custom' && (
-                                        <Label id={`group-role-label-${group.id}-${roleWithDate.roleId}`} color="blue" variant="outline">
+                                        <Label id={`group-role-label-${group.id}-${roleWithDate.roleId}`} color="blue" variant="outline" isCompact>
                                           {role.label}
                                         </Label>
                                       )}
@@ -1444,21 +1491,42 @@ const ProjectDetails: React.FunctionComponent = () => {
                                     isExpanded={isGroupSelectOpen}
                                     isFullWidth
                                   >
-                                    <TextInputGroup isPlain>
-                                      <TextInputGroupMain
-                                        value={newGroupInput}
-                                        onChange={(_event, value) => {
-                                          setNewGroupInput(value);
-                                          // If user types something different, clear selected group
-                                          if (value !== selectedNewGroup) {
-                                            setSelectedNewGroup(null);
-                                          }
-                                        }}
-                                        onFocus={() => setIsGroupSelectOpen(true)}
-                                        placeholder="Type to search or create"
-                                        id="new-group-input"
-                                      />
-                                    </TextInputGroup>
+                                    <Flex>
+                                      <FlexItem grow={{ default: 'grow' }}>
+                                        <TextInputGroup isPlain>
+                                          <TextInputGroupMain
+                                            value={newGroupInput}
+                                            onChange={(_event, value) => {
+                                              setNewGroupInput(value);
+                                              // If user types something different, clear selected group
+                                              if (value !== selectedNewGroup) {
+                                                setSelectedNewGroup(null);
+                                              }
+                                            }}
+                                            onFocus={() => setIsGroupSelectOpen(true)}
+                                            placeholder="Type to search or create"
+                                            id="new-group-input"
+                                          />
+                                        </TextInputGroup>
+                                      </FlexItem>
+                                      {(selectedNewGroup || newGroupInput.trim()) && (
+                                        <FlexItem>
+                                          <Button
+                                            variant="plain"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setSelectedNewGroup(null);
+                                              setNewGroupInput('');
+                                              setIsGroupSelectOpen(false);
+                                            }}
+                                            aria-label="Clear selection"
+                                            id="clear-group-selection"
+                                          >
+                                            <CloseIcon />
+                                          </Button>
+                                        </FlexItem>
+                                      )}
+                                    </Flex>
                                   </MenuToggle>
                                 )}
                                 popperProps={{ appendTo: () => document.body }}
@@ -1499,13 +1567,38 @@ const ProjectDetails: React.FunctionComponent = () => {
                                 toggle={(toggleRef) => (
                                   <MenuToggle
                                     ref={toggleRef}
-                                    onClick={() => setIsGroupRoleSelectOpen(!isGroupRoleSelectOpen)}
+                                    onClick={() => !(!selectedNewGroup && !newGroupInput.trim()) && setIsGroupRoleSelectOpen(!isGroupRoleSelectOpen)}
                                     isExpanded={isGroupRoleSelectOpen}
                                     isFullWidth
+                                    isDisabled={!selectedNewGroup && !newGroupInput.trim()}
                                   >
-                                    {selectedNewGroupRoles.size > 0
-                                      ? `${selectedNewGroupRoles.size} role${selectedNewGroupRoles.size > 1 ? 's' : ''} selected`
-                                      : 'Select roles'}
+                                    {selectedNewGroupRoles.size > 0 ? (
+                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                        {Array.from(selectedNewGroupRoles).map((roleId) => {
+                                          const role = mockRoles.find((r) => r.id === roleId);
+                                          if (!role) return null;
+                                          return (
+                                            <Label
+                                              key={roleId}
+                                              color="blue"
+                                              variant="outline"
+                                              onClose={() => {
+                                                setSelectedNewGroupRoles((prev) => {
+                                                  const newSet = new Set(prev);
+                                                  newSet.delete(roleId);
+                                                  return newSet;
+                                                });
+                                              }}
+                                              id={`selected-group-role-label-${roleId}`}
+                                            >
+                                              {role.name}
+                                            </Label>
+                                          );
+                                        })}
+                                      </div>
+                                    ) : (
+                                      'Select roles'
+                                    )}
                                   </MenuToggle>
                                 )}
                                 popperProps={{ appendTo: () => document.body }}
@@ -1537,7 +1630,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       </Button>
                                       <span>{role.name}</span>
                                       {role.id !== 'role-custom' && (
-                                        <Label color="blue" variant="outline">
+                                        <Label color="blue" variant="outline" isCompact>
                                           {role.label}
                                         </Label>
                                       )}
