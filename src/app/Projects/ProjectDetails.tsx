@@ -1070,6 +1070,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                       <Thead>
                         <Tr>
                           <Th
+                            width={25}
                             style={tableHeaderStyle}
                             sort={{
                               sortBy: usersSortBy || {},
@@ -1080,6 +1081,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                             Name
                           </Th>
                           <Th
+                            width={40}
                             style={tableHeaderStyle}
                             sort={{
                               sortBy: usersSortBy || {},
@@ -1090,6 +1092,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                             Role
                           </Th>
                           <Th
+                            width={20}
                             style={tableHeaderStyle}
                             sort={{
                               sortBy: usersSortBy || {},
@@ -1099,7 +1102,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                           >
                             Date added
                           </Th>
-                          <Th style={tableHeaderStyle}></Th>
+                          <Th width={15} style={tableHeaderStyle}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -1539,6 +1542,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                       <Thead>
                         <Tr>
                           <Th
+                            width={25}
                             style={tableHeaderStyle}
                             sort={{
                               sortBy: groupsSortBy || {},
@@ -1549,6 +1553,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                             Name
                           </Th>
                           <Th
+                            width={40}
                             style={tableHeaderStyle}
                             sort={{
                               sortBy: groupsSortBy || {},
@@ -1559,6 +1564,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                             Role
                           </Th>
                           <Th
+                            width={20}
                             style={tableHeaderStyle}
                             sort={{
                               sortBy: groupsSortBy || {},
@@ -1568,7 +1574,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                           >
                             Date added
                           </Th>
-                          <Th style={tableHeaderStyle}></Th>
+                          <Th width={15} style={tableHeaderStyle}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
