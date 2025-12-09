@@ -1017,11 +1017,11 @@ const ProjectDetails: React.FunctionComponent = () => {
             <TabContent id="project-tab-content-permissions">
               <TabContentBody>
                 <PageSection variant="default" hasBodyWrapper={false}>
-                  <Card style={{ marginBottom: 'var(--pf-v6-global--spacer--lg)' }}>
+                  <Card style={{ marginBottom: 'var(--pf-v6-global--spacer--lg)', backgroundColor: '#FF00FF' }}>
                     <CardBody>
                       <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapMd' }}>
                         <FlexItem>
-                          <span style={{ color: 'var(--pf-v6-global--Color--200)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
+                          <span style={{ color: 'var(--pf-v6-global--palette--white)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
                         </FlexItem>
                         <FlexItem>
                           <ToggleGroup aria-label="Role menu variant">
