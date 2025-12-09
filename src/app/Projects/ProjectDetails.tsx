@@ -465,6 +465,29 @@ const ProjectDetails: React.FunctionComponent = () => {
     verticalAlign: 'top',
   };
 
+  const altRoleMenuStyle: React.CSSProperties = {
+    display: 'flex',
+    width: '511px',
+    padding: '8px 0',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    borderRadius: '6px',
+    border: '0 solid rgba(255, 255, 255, 0)',
+    background: '#FFF',
+    boxShadow: '0 4px 9px 0 rgba(41, 41, 41, 0.15)',
+  };
+
+  const altRoleHeaderRowStyle: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: '32px 32px 1fr 1fr',
+    alignItems: 'center',
+    width: '100%',
+    gap: '8px',
+    padding: '4px var(--pf-v6-global--spacer--md)',
+    color: 'var(--pf-v6-global--Color--200)',
+    fontWeight: 600,
+  };
+
   const onOpenRole = (roleId: string) => {
     setSelectedRoleId(roleId);
     setActiveRoleModalTab('details');
@@ -1340,14 +1363,22 @@ const ProjectDetails: React.FunctionComponent = () => {
                           >
                             <SelectList>
                               {roleMenuVariant === 'alt' && (
-                                <div style={{ padding: 'var(--pf-v6-global--spacer--sm)', borderBottom: '1px solid var(--pf-v6-global--BorderColor--100)' }}>
-                                  <SearchInput
-                                    placeholder="Find by name"
-                                    value={userRoleSearchValue}
-                                    onChange={(_event, value) => setUserRoleSearchValue(value)}
-                                    onClear={() => setUserRoleSearchValue('')}
-                                    id="user-role-search-input"
-                                  />
+                                <div style={altRoleMenuStyle}>
+                                  <div style={{ width: '100%', padding: 'var(--pf-v6-global--spacer--sm) var(--pf-v6-global--spacer--md)', borderBottom: '1px solid var(--pf-v6-global--BorderColor--100)' }}>
+                                    <SearchInput
+                                      placeholder="Find by name"
+                                      value={userRoleSearchValue}
+                                      onChange={(_event, value) => setUserRoleSearchValue(value)}
+                                      onClear={() => setUserRoleSearchValue('')}
+                                      id="user-role-search-input"
+                                    />
+                                  </div>
+                                  <div style={altRoleHeaderRowStyle}>
+                                    <span></span>
+                                    <span></span>
+                                    <span>Role name</span>
+                                    <span>Description</span>
+                                  </div>
                                 </div>
                               )}
                               {mockRoles
@@ -1377,16 +1408,16 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       const optionContent =
                                         roleMenuVariant === 'alt'
                                           ? (
-                                            <div
-                                              style={{
-                                                display: 'grid',
-                                                gridTemplateColumns: '32px 32px 1fr 1fr',
-                                                alignItems: 'center',
-                                                width: '100%',
-                                                gap: '8px',
-                                                padding: '4px 0',
-                                              }}
-                                            >
+                                      <div
+                                        style={{
+                                          display: 'grid',
+                                          gridTemplateColumns: '32px 32px 1fr 1fr',
+                                          alignItems: 'center',
+                                          width: '100%',
+                                          gap: '8px',
+                                          padding: '4px var(--pf-v6-global--spacer--md)',
+                                        }}
+                                      >
                                         <Button
                                           variant="plain"
                                           onClick={(e) => {
@@ -1424,7 +1455,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                                 )}
                                               </div>
                                               <div style={{ color: 'var(--pf-v6-global--Color--200)' }}>
-                                                {role.description || 'Description goes here.'}
+                                                {role.description || ''}
                                               </div>
                                             </div>
                                           )
@@ -1461,13 +1492,13 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             value={role.id}
                                             id={`role-option-${role.id}`}
                                             hasCheckbox={!isDisabled && roleMenuVariant === 'current'}
-                                isSelected={isSelected}
-                                isAriaDisabled={isDisabled}
-                                onClick={() => {
-                                  if (isDisabled) return;
-                                  handleRoleToggle(role.id);
-                                }}
-                                            description={role.description || 'Role description'}
+                                            isSelected={isSelected}
+                                            isAriaDisabled={isDisabled}
+                                            onClick={() => {
+                                              if (isDisabled) return;
+                                              handleRoleToggle(role.id);
+                                            }}
+                                            description={roleMenuVariant === 'current' ? role.description || 'Role description' : undefined}
                                           >
                                             {isDisabled ? (
                                               <Tooltip content="This role has been granted to the selected user">{optionContent}</Tooltip>
@@ -1827,14 +1858,22 @@ const ProjectDetails: React.FunctionComponent = () => {
                               >
                                 <SelectList>
                                   {roleMenuVariant === 'alt' && (
-                                    <div style={{ padding: 'var(--pf-v6-global--spacer--sm)', borderBottom: '1px solid var(--pf-v6-global--BorderColor--100)' }}>
-                                      <SearchInput
-                                        placeholder="Find by name"
-                                        value={groupRoleSearchValue}
-                                        onChange={(_event, value) => setGroupRoleSearchValue(value)}
-                                        onClear={() => setGroupRoleSearchValue('')}
-                                        id="group-role-search-input"
-                                      />
+                                    <div style={altRoleMenuStyle}>
+                                      <div style={{ width: '100%', padding: 'var(--pf-v6-global--spacer--sm) var(--pf-v6-global--spacer--md)', borderBottom: '1px solid var(--pf-v6-global--BorderColor--100)' }}>
+                                        <SearchInput
+                                          placeholder="Find by name"
+                                          value={groupRoleSearchValue}
+                                          onChange={(_event, value) => setGroupRoleSearchValue(value)}
+                                          onClear={() => setGroupRoleSearchValue('')}
+                                          id="group-role-search-input"
+                                        />
+                                      </div>
+                                      <div style={altRoleHeaderRowStyle}>
+                                        <span></span>
+                                        <span></span>
+                                        <span>Role name</span>
+                                        <span>Description</span>
+                                      </div>
                                     </div>
                                   )}
                                   {mockRoles
@@ -1870,7 +1909,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             alignItems: 'center',
                                             width: '100%',
                                             gap: '8px',
-                                            padding: '4px 0',
+                                            padding: '4px var(--pf-v6-global--spacer--md)',
                                           }}
                                         >
                                           <Button
@@ -1910,7 +1949,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             )}
                                           </div>
                                           <div style={{ color: 'var(--pf-v6-global--Color--200)' }}>
-                                            {role.description || 'Description goes here.'}
+                                            {role.description || ''}
                                           </div>
                                         </div>
                                       )
@@ -1953,7 +1992,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       if (isDisabled) return;
                                       handleRoleToggle(role.id);
                                     }}
-                                        description={role.description || 'Role description'}
+                                        description={roleMenuVariant === 'current' ? role.description || 'Role description' : undefined}
                                       >
                                         {isDisabled ? (
                                           <Tooltip content="This role has been granted to the selected user">{optionContent}</Tooltip>
