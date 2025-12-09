@@ -1028,8 +1028,8 @@ const ProjectDetails: React.FunctionComponent = () => {
                     Add users and groups that can access the project.
                   </div>
 
-                  <div style={{ marginBottom: 'var(--pf-v6-global--spacer--xl)' }}>
-                    <Flex alignItems={{ default: 'alignItemsCenter' }} style={{ marginBottom: 'var(--pf-v6-global--spacer--md)' }}>
+                  <div style={{ marginBottom: 'var(--pf-v6-global--spacer--md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <Flex alignItems={{ default: 'alignItemsCenter' }}>
                       <FlexItem>
                         <UserIcon style={{ marginRight: 'var(--pf-v6-global--spacer--sm)' }} />
                       </FlexItem>
@@ -1039,6 +1039,26 @@ const ProjectDetails: React.FunctionComponent = () => {
                         </Title>
                       </FlexItem>
                     </Flex>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: 'var(--pf-v6-global--Color--200)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
+                      <ToggleGroup aria-label="Role menu variant">
+                        <ToggleGroupItem
+                          text="Current"
+                          buttonId="role-menu-variant-current"
+                          isSelected={roleMenuVariant === 'current'}
+                          onChange={() => setRoleMenuVariant('current')}
+                        />
+                        <ToggleGroupItem
+                          text="Alt"
+                          buttonId="role-menu-variant-alt"
+                          isSelected={roleMenuVariant === 'alt'}
+                          onChange={() => setRoleMenuVariant('alt')}
+                        />
+                      </ToggleGroup>
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: 'var(--pf-v6-global--spacer--xl)' }}>
                     <Table aria-label="Users table" id="permissions-users-table" isStickyHeader>
                       <Thead>
                         <Tr>
@@ -1248,23 +1268,6 @@ const ProjectDetails: React.FunctionComponent = () => {
                           )}
                         </Td>
                         <Td style={tableCellStyle}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 'var(--pf-v6-global--spacer--sm)', gap: '8px' }}>
-                            <span style={{ color: 'var(--pf-v6-global--Color--200)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
-                            <ToggleGroup aria-label="Role menu variant">
-                              <ToggleGroupItem
-                                text="Current"
-                                buttonId="role-menu-variant-current"
-                                isSelected={roleMenuVariant === 'current'}
-                                onChange={() => setRoleMenuVariant('current')}
-                              />
-                              <ToggleGroupItem
-                                text="Alt"
-                                buttonId="role-menu-variant-alt"
-                                isSelected={roleMenuVariant === 'alt'}
-                                onChange={() => setRoleMenuVariant('alt')}
-                              />
-                            </ToggleGroup>
-                          </div>
                           <Select
                             id="new-user-role-select"
                             isOpen={isUserRoleSelectOpen}
@@ -1731,23 +1734,6 @@ const ProjectDetails: React.FunctionComponent = () => {
                               )}
                             </Td>
                             <Td style={tableCellStyle}>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 'var(--pf-v6-global--spacer--sm)', gap: '8px' }}>
-                                <span style={{ color: 'var(--pf-v6-global--Color--200)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
-                                <ToggleGroup aria-label="Role menu variant">
-                                  <ToggleGroupItem
-                                    text="Current"
-                                    buttonId="role-menu-variant-current-group"
-                                    isSelected={roleMenuVariant === 'current'}
-                                    onChange={() => setRoleMenuVariant('current')}
-                                  />
-                                  <ToggleGroupItem
-                                    text="Alt"
-                                    buttonId="role-menu-variant-alt-group"
-                                    isSelected={roleMenuVariant === 'alt'}
-                                    onChange={() => setRoleMenuVariant('alt')}
-                                  />
-                                </ToggleGroup>
-                              </div>
                               <Select
                                 id="new-group-role-select"
                                 isOpen={isGroupRoleSelectOpen}
