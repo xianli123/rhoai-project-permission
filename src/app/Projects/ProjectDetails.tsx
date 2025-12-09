@@ -34,6 +34,8 @@ import {
   SelectOption,
   FormSelect,
   FormSelectOption,
+  ToggleGroup,
+  ToggleGroupItem,
   Tab,
   TabContent,
   TabContentBody,
@@ -174,6 +176,7 @@ const ProjectDetails: React.FunctionComponent = () => {
   const [isUserRoleSelectOpen, setIsUserRoleSelectOpen] = React.useState(false);
   const [isGroupRoleSelectOpen, setIsGroupRoleSelectOpen] = React.useState(false);
   const [expandedRoles, setExpandedRoles] = React.useState<Set<string>>(new Set());
+  const [roleMenuVariant, setRoleMenuVariant] = React.useState<'current' | 'alt'>('current');
 
   // Mock data as state for mutability
   const [mockUsers, setMockUsers] = React.useState<PermissionEntry[]>([
@@ -1183,15 +1186,15 @@ const ProjectDetails: React.FunctionComponent = () => {
                                     />
                                   )}
                                   {!selectedNewUser && (
-                                    <TextInputGroupMain
-                                      value={newUserInput}
-                                      onChange={(_event, value) => {
-                                        setNewUserInput(value);
-                                      }}
-                                      onFocus={() => setIsUserSelectOpen(true)}
-                                      placeholder="Type to search or create"
-                                      id="new-user-input"
-                                    />
+                                  <TextInputGroupMain
+                                    value={newUserInput}
+                                    onChange={(_event, value) => {
+                                      setNewUserInput(value);
+                                    }}
+                                    onFocus={() => setIsUserSelectOpen(true)}
+                                    placeholder="Type to search or create"
+                                    id="new-user-input"
+                                  />
                                   )}
                                   {(selectedNewUser || newUserInput.trim()) && (
                                     <Button
@@ -1245,6 +1248,23 @@ const ProjectDetails: React.FunctionComponent = () => {
                           )}
                         </Td>
                         <Td style={tableCellStyle}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 'var(--pf-v6-global--spacer--sm)', gap: '8px' }}>
+                            <span style={{ color: 'var(--pf-v6-global--Color--200)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
+                            <ToggleGroup aria-label="Role menu variant">
+                              <ToggleGroupItem
+                                text="Current"
+                                buttonId="role-menu-variant-current"
+                                isSelected={roleMenuVariant === 'current'}
+                                onChange={() => setRoleMenuVariant('current')}
+                              />
+                              <ToggleGroupItem
+                                text="Alt"
+                                buttonId="role-menu-variant-alt"
+                                isSelected={roleMenuVariant === 'alt'}
+                                onChange={() => setRoleMenuVariant('alt')}
+                              />
+                            </ToggleGroup>
+                          </div>
                           <Select
                             id="new-user-role-select"
                             isOpen={isUserRoleSelectOpen}
@@ -1306,7 +1326,7 @@ const ProjectDetails: React.FunctionComponent = () => {
                               {mockRoles
                                 .filter((role) => role.id !== 'role-custom')
                                 .map((role) => {
-                                      const isDisabled = selectedNewUser
+                                  const isDisabled = selectedNewUser
                                     ? getExistingUserRoles(selectedNewUser).has(role.id)
                                     : false;
                                   const isSelected = selectedNewUserRoles.has(role.id);
@@ -1320,39 +1340,93 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       onChange={() => undefined}
                                     />
                                   ) : null;
-                                      const optionContent = (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                          {disabledCheckbox}
-                                          <Button
-                                            variant="plain"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              toggleRoleExpansion(role.id);
-                                            }}
-                                            id={`expand-role-${role.id}`}
-                                            style={{ padding: 0 }}
-                                          >
-                                            <AngleRightIcon
+                                      const optionContent =
+                                        roleMenuVariant === 'alt'
+                                          ? (
+                                            <div
                                               style={{
-                                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                                                transition: 'transform 0.2s',
+                                                display: 'grid',
+                                                gridTemplateColumns: '32px 32px 1fr 1fr',
+                                                alignItems: 'center',
+                                                width: '100%',
+                                                gap: '8px',
+                                                padding: '4px 0',
                                               }}
-                                            />
-                                          </Button>
-                                          <span>{role.name}</span>
+                                            >
+                                        <Button
+                                          variant="plain"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleRoleExpansion(role.id);
+                                          }}
+                                          id={`expand-role-${role.id}`}
+                                          style={{ padding: 0 }}
+                                                aria-label={`Expand ${role.name}`}
+                                        >
+                                          <AngleRightIcon
+                                            style={{
+                                              transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                              transition: 'transform 0.2s',
+                                            }}
+                                          />
+                                        </Button>
+                                              {disabledCheckbox || (
+                                                <Checkbox
+                                                  id={`role-checkbox-${role.id}`}
+                                                  isChecked={isSelected}
+                                                onChange={(event: React.FormEvent<HTMLInputElement>, checked: boolean) => {
+                                                  event.stopPropagation();
+                                                  handleRoleToggle(role.id);
+                                                }}
+                                                  aria-label={`Select ${role.name}`}
+                                                />
+                                              )}
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span>{role.name}</span>
+                                                {role.id !== 'role-custom' && (
+                                                  <Label color="blue" variant="outline" isCompact>
+                                                    {role.label}
+                                          </Label>
+                                                )}
+                                              </div>
+                                              <div style={{ color: 'var(--pf-v6-global--Color--200)' }}>
+                                                {role.description || 'Description goes here.'}
+                                              </div>
+                                            </div>
+                                          )
+                                          : (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                              {disabledCheckbox}
+                                              <Button
+                                                variant="plain"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  toggleRoleExpansion(role.id);
+                                                }}
+                                                id={`expand-role-${role.id}`}
+                                                style={{ padding: 0 }}
+                                              >
+                                                <AngleRightIcon
+                                                  style={{
+                                                    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                                    transition: 'transform 0.2s',
+                                                  }}
+                                                />
+                                              </Button>
+                                              <span>{role.name}</span>
                                       {role.id !== 'role-custom' && (
                                         <Label color="blue" variant="outline" isCompact>
-                                          {role.label}
-                                        </Label>
-                                      )}
-                                        </div>
-                                      );
+                                            {role.label}
+                                          </Label>
+                                        )}
+                                      </div>
+                                          );
                                       return (
                                         <React.Fragment key={role.id}>
                                           <SelectOption
                                             value={role.id}
                                             id={`role-option-${role.id}`}
-                                            hasCheckbox={!isDisabled}
+                                            hasCheckbox={!isDisabled && roleMenuVariant === 'current'}
                                 isSelected={isSelected}
                                 isAriaDisabled={isDisabled}
                                 onClick={() => {
@@ -1366,29 +1440,36 @@ const ProjectDetails: React.FunctionComponent = () => {
                                             ) : (
                                               optionContent
                                             )}
-                                          </SelectOption>
-                                          {isExpanded && (
-                                            <div style={{ paddingLeft: 'var(--pf-v6-global--spacer--xl)', paddingBottom: 'var(--pf-v6-global--spacer--sm)' }}>
-                                              <Table variant="compact" isNested>
-                                                <Thead>
-                                                  <Tr>
-                                                    <Th>Actions</Th>
-                                                    <Th>Resources</Th>
-                                                    <Th>Resource names</Th>
-                                                  </Tr>
-                                                </Thead>
-                                                <Tbody>
-                                                  <Tr>
-                                                    <Td>{role.actions}</Td>
-                                                    <Td>{role.resources}</Td>
-                                                    <Td>{role.resourceNames}</Td>
-                                                  </Tr>
-                                                </Tbody>
-                                              </Table>
-                                            </div>
-                                          )}
-                                        </React.Fragment>
-                                      );
+                                    </SelectOption>
+                                    {isExpanded && (
+                                            <div
+                                              style={{
+                                                padding: 'var(--pf-v6-global--spacer--sm)',
+                                                paddingLeft: 'var(--pf-v6-global--spacer--xl)',
+                                                backgroundColor: 'var(--pf-v6-global--palette--black-100)',
+                                              }}
+                                            >
+                                              <div style={{ fontWeight: 600, marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>Rules</div>
+                                        <Table variant="compact" isNested>
+                                          <Thead>
+                                            <Tr>
+                                              <Th>Actions</Th>
+                                              <Th>Resources</Th>
+                                              <Th>Resource names</Th>
+                                            </Tr>
+                                          </Thead>
+                                          <Tbody>
+                                            <Tr>
+                                              <Td>{role.actions}</Td>
+                                              <Td>{role.resources}</Td>
+                                              <Td>{role.resourceNames}</Td>
+                                            </Tr>
+                                          </Tbody>
+                                        </Table>
+                                      </div>
+                                    )}
+                                  </React.Fragment>
+                                );
                               })}
                             </SelectList>
                           </Select>
@@ -1591,15 +1672,15 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         />
                                       )}
                                       {!selectedNewGroup && (
-                                        <TextInputGroupMain
-                                          value={newGroupInput}
-                                          onChange={(_event, value) => {
-                                            setNewGroupInput(value);
-                                          }}
-                                          onFocus={() => setIsGroupSelectOpen(true)}
-                                          placeholder="Type to search or create"
-                                          id="new-group-input"
-                                        />
+                                      <TextInputGroupMain
+                                        value={newGroupInput}
+                                        onChange={(_event, value) => {
+                                          setNewGroupInput(value);
+                                        }}
+                                        onFocus={() => setIsGroupSelectOpen(true)}
+                                        placeholder="Type to search or create"
+                                        id="new-group-input"
+                                      />
                                       )}
                                       {(selectedNewGroup || newGroupInput.trim()) && (
                                         <Button
@@ -1650,6 +1731,23 @@ const ProjectDetails: React.FunctionComponent = () => {
                               )}
                             </Td>
                             <Td style={tableCellStyle}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 'var(--pf-v6-global--spacer--sm)', gap: '8px' }}>
+                                <span style={{ color: 'var(--pf-v6-global--Color--200)', fontSize: 'var(--pf-v6-global--FontSize--sm)' }}>Role menu view</span>
+                                <ToggleGroup aria-label="Role menu variant">
+                                  <ToggleGroupItem
+                                    text="Current"
+                                    buttonId="role-menu-variant-current-group"
+                                    isSelected={roleMenuVariant === 'current'}
+                                    onChange={() => setRoleMenuVariant('current')}
+                                  />
+                                  <ToggleGroupItem
+                                    text="Alt"
+                                    buttonId="role-menu-variant-alt-group"
+                                    isSelected={roleMenuVariant === 'alt'}
+                                    onChange={() => setRoleMenuVariant('alt')}
+                                  />
+                                </ToggleGroup>
+                              </div>
                               <Select
                                 id="new-group-role-select"
                                 isOpen={isGroupRoleSelectOpen}
@@ -1709,11 +1807,11 @@ const ProjectDetails: React.FunctionComponent = () => {
                               >
                                 <SelectList>
                                   {mockRoles.map((role) => {
-                                  const isDisabled = selectedNewGroup
-                                    ? getExistingGroupRoles(selectedNewGroup).has(role.id)
-                                    : false;
-                                  const isSelected = selectedNewGroupRoles.has(role.id);
-                                  const isExpanded = expandedRoles.has(role.id);
+                                    const isDisabled = selectedNewGroup
+                                      ? getExistingGroupRoles(selectedNewGroup).has(role.id)
+                                      : false;
+                                    const isSelected = selectedNewGroupRoles.has(role.id);
+                                    const isExpanded = expandedRoles.has(role.id);
                                   const disabledCheckbox = isDisabled ? (
                                     <Checkbox
                                       id={`disabled-group-role-checkbox-${role.id}`}
@@ -1723,39 +1821,93 @@ const ProjectDetails: React.FunctionComponent = () => {
                                       onChange={() => undefined}
                                     />
                                   ) : null;
-                                  const optionContent = (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      {disabledCheckbox}
-                                      <Button
-                                        variant="plain"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleRoleExpansion(role.id);
-                                        }}
-                                        id={`expand-group-role-${role.id}`}
-                                        style={{ padding: 0 }}
-                                      >
-                                        <AngleRightIcon
+                                  const optionContent =
+                                    roleMenuVariant === 'alt'
+                                      ? (
+                                        <div
                                           style={{
-                                            transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                                            transition: 'transform 0.2s',
+                                            display: 'grid',
+                                            gridTemplateColumns: '32px 32px 1fr 1fr',
+                                            alignItems: 'center',
+                                            width: '100%',
+                                            gap: '8px',
+                                            padding: '4px 0',
                                           }}
-                                        />
-                                      </Button>
-                                      <span>{role.name}</span>
-                                      {role.id !== 'role-custom' && (
-                                        <Label color="blue" variant="outline" isCompact>
-                                          {role.label}
-                                        </Label>
-                                      )}
-                                    </div>
-                                  );
+                                        >
+                                          <Button
+                                            variant="plain"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              toggleRoleExpansion(role.id);
+                                            }}
+                                            id={`expand-group-role-${role.id}`}
+                                            style={{ padding: 0 }}
+                                            aria-label={`Expand ${role.name}`}
+                                          >
+                                            <AngleRightIcon
+                                              style={{
+                                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.2s',
+                                              }}
+                                            />
+                                          </Button>
+                                          {disabledCheckbox || (
+                                            <Checkbox
+                                              id={`group-role-checkbox-${role.id}`}
+                                              isChecked={isSelected}
+                                            onChange={(event: React.FormEvent<HTMLInputElement>, checked: boolean) => {
+                                              event.stopPropagation();
+                                              handleRoleToggle(role.id);
+                                            }}
+                                              aria-label={`Select ${role.name}`}
+                                            />
+                                          )}
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <span>{role.name}</span>
+                                            {role.id !== 'role-custom' && (
+                                              <Label color="blue" variant="outline" isCompact>
+                                                {role.label}
+                                              </Label>
+                                            )}
+                                          </div>
+                                          <div style={{ color: 'var(--pf-v6-global--Color--200)' }}>
+                                            {role.description || 'Description goes here.'}
+                                          </div>
+                                        </div>
+                                      )
+                                      : (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                          {disabledCheckbox}
+                                            <Button
+                                              variant="plain"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleRoleExpansion(role.id);
+                                              }}
+                                              id={`expand-group-role-${role.id}`}
+                                              style={{ padding: 0 }}
+                                            >
+                                              <AngleRightIcon
+                                                style={{
+                                                  transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                                  transition: 'transform 0.2s',
+                                                }}
+                                              />
+                                            </Button>
+                                            <span>{role.name}</span>
+                                          {role.id !== 'role-custom' && (
+                                            <Label color="blue" variant="outline" isCompact>
+                                              {role.label}
+                                            </Label>
+                                            )}
+                                          </div>
+                                      );
                                   return (
                                     <React.Fragment key={role.id}>
                                       <SelectOption
                                         value={role.id}
                                         id={`group-role-option-${role.id}`}
-                                        hasCheckbox={!isDisabled}
+                                        hasCheckbox={!isDisabled && roleMenuVariant === 'current'}
                                     isSelected={isSelected}
                                     isAriaDisabled={isDisabled}
                                     onClick={() => {
@@ -1769,29 +1921,36 @@ const ProjectDetails: React.FunctionComponent = () => {
                                         ) : (
                                           optionContent
                                         )}
-                                      </SelectOption>
-                                      {isExpanded && (
-                                        <div style={{ paddingLeft: 'var(--pf-v6-global--spacer--xl)', paddingBottom: 'var(--pf-v6-global--spacer--sm)' }}>
-                                          <Table variant="compact" isNested>
-                                            <Thead>
-                                              <Tr>
-                                                <Th>Actions</Th>
-                                                <Th>Resources</Th>
-                                                <Th>Resource names</Th>
-                                              </Tr>
-                                            </Thead>
-                                            <Tbody>
-                                              <Tr>
-                                                <Td>{role.actions}</Td>
-                                                <Td>{role.resources}</Td>
-                                                <Td>{role.resourceNames}</Td>
-                                              </Tr>
-                                            </Tbody>
-                                          </Table>
-                                        </div>
-                                      )}
-                                    </React.Fragment>
-                                  );
+                                        </SelectOption>
+                                        {isExpanded && (
+                                        <div
+                                          style={{
+                                            padding: 'var(--pf-v6-global--spacer--sm)',
+                                            paddingLeft: 'var(--pf-v6-global--spacer--xl)',
+                                            backgroundColor: 'var(--pf-v6-global--palette--black-100)',
+                                          }}
+                                        >
+                                          <div style={{ fontWeight: 600, marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>Rules</div>
+                                            <Table variant="compact" isNested>
+                                              <Thead>
+                                                <Tr>
+                                                  <Th>Actions</Th>
+                                                  <Th>Resources</Th>
+                                                  <Th>Resource names</Th>
+                                                </Tr>
+                                              </Thead>
+                                              <Tbody>
+                                                <Tr>
+                                                  <Td>{role.actions}</Td>
+                                                  <Td>{role.resources}</Td>
+                                                  <Td>{role.resourceNames}</Td>
+                                                </Tr>
+                                              </Tbody>
+                                            </Table>
+                                          </div>
+                                        )}
+                                      </React.Fragment>
+                                    );
                                   })}
                                 </SelectList>
                               </Select>
@@ -1915,12 +2074,12 @@ const ProjectDetails: React.FunctionComponent = () => {
                     </DescriptionListDescription>
                   </DescriptionListGroup>
                 </DescriptionList>
-                <Title headingLevel="h3" size="lg" style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>
+            <Title headingLevel="h3" size="lg" style={{ marginBottom: 'var(--pf-v6-global--spacer--sm)' }}>
                   Rules
-                </Title>
-                <Table aria-label="Role rules table" id="role-rules-table">
-                  <Thead>
-                    <Tr>
+            </Title>
+            <Table aria-label="Role rules table" id="role-rules-table">
+              <Thead>
+                <Tr>
                       <Th
                         sort={{
                           sortBy: rulesSortBy || {},
@@ -1956,16 +2115,16 @@ const ProjectDetails: React.FunctionComponent = () => {
                           </Button>
                         </Popover>
                       </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td>{roleMap[selectedRoleId].actions}</Td>
-                      <Td>{roleMap[selectedRoleId].resources}</Td>
-                      <Td>{roleMap[selectedRoleId].resourceNames}</Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>{roleMap[selectedRoleId].actions}</Td>
+                  <Td>{roleMap[selectedRoleId].resources}</Td>
+                  <Td>{roleMap[selectedRoleId].resourceNames}</Td>
+                </Tr>
+              </Tbody>
+            </Table>
               </Tab>
               <Tab eventKey="assignees" title={<TabTitleText>Assignees</TabTitleText>}>
                 <Table aria-label="Role assignees table" id="role-assignees-table">
