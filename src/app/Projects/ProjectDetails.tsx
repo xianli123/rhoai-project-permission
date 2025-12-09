@@ -47,6 +47,7 @@ import {
   Title,
   Tooltip,
   Content,
+  SearchInput,
 } from '@patternfly/react-core';
 import {
   Table,
@@ -177,6 +178,8 @@ const ProjectDetails: React.FunctionComponent = () => {
   const [isGroupRoleSelectOpen, setIsGroupRoleSelectOpen] = React.useState(false);
   const [expandedRoles, setExpandedRoles] = React.useState<Set<string>>(new Set());
   const [roleMenuVariant, setRoleMenuVariant] = React.useState<'current' | 'alt'>('current');
+  const [userRoleSearchValue, setUserRoleSearchValue] = React.useState('');
+  const [groupRoleSearchValue, setGroupRoleSearchValue] = React.useState('');
 
   // Mock data as state for mutability
   const [mockUsers, setMockUsers] = React.useState<PermissionEntry[]>([
@@ -1336,8 +1339,26 @@ const ProjectDetails: React.FunctionComponent = () => {
                             popperProps={{ appendTo: () => document.body }}
                           >
                             <SelectList>
+                              {roleMenuVariant === 'alt' && (
+                                <div style={{ padding: 'var(--pf-v6-global--spacer--sm)', borderBottom: '1px solid var(--pf-v6-global--BorderColor--100)' }}>
+                                  <SearchInput
+                                    placeholder="Find by name"
+                                    value={userRoleSearchValue}
+                                    onChange={(_event, value) => setUserRoleSearchValue(value)}
+                                    onClear={() => setUserRoleSearchValue('')}
+                                    id="user-role-search-input"
+                                  />
+                                </div>
+                              )}
                               {mockRoles
                                 .filter((role) => role.id !== 'role-custom')
+                                .filter((role) => {
+                                  if (roleMenuVariant === 'alt' && userRoleSearchValue) {
+                                    return role.name.toLowerCase().includes(userRoleSearchValue.toLowerCase()) ||
+                                      (role.description && role.description.toLowerCase().includes(userRoleSearchValue.toLowerCase()));
+                                  }
+                                  return true;
+                                })
                                 .map((role) => {
                                   const isDisabled = selectedNewUser
                                     ? getExistingUserRoles(selectedNewUser).has(role.id)
@@ -1805,7 +1826,26 @@ const ProjectDetails: React.FunctionComponent = () => {
                                 popperProps={{ appendTo: () => document.body }}
                               >
                                 <SelectList>
-                                  {mockRoles.map((role) => {
+                                  {roleMenuVariant === 'alt' && (
+                                    <div style={{ padding: 'var(--pf-v6-global--spacer--sm)', borderBottom: '1px solid var(--pf-v6-global--BorderColor--100)' }}>
+                                      <SearchInput
+                                        placeholder="Find by name"
+                                        value={groupRoleSearchValue}
+                                        onChange={(_event, value) => setGroupRoleSearchValue(value)}
+                                        onClear={() => setGroupRoleSearchValue('')}
+                                        id="group-role-search-input"
+                                      />
+                                    </div>
+                                  )}
+                                  {mockRoles
+                                    .filter((role) => {
+                                      if (roleMenuVariant === 'alt' && groupRoleSearchValue) {
+                                        return role.name.toLowerCase().includes(groupRoleSearchValue.toLowerCase()) ||
+                                          (role.description && role.description.toLowerCase().includes(groupRoleSearchValue.toLowerCase()));
+                                      }
+                                      return true;
+                                    })
+                                    .map((role) => {
                                     const isDisabled = selectedNewGroup
                                       ? getExistingGroupRoles(selectedNewGroup).has(role.id)
                                       : false;
